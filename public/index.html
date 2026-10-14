@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="only light">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#8C6BB8">
+<title>ハロプロ Threads 検索</title>
+<meta name="description" content="ハロー！プロジェクトの現役メンバーとOGの公式Threadsの投稿を、日付・メンバー・本文から探せます。毎日自動で更新しています。">
+<meta property="og:title" content="ハロプロ Threads 検索">
+<meta property="og:description" content="ハロー！プロジェクトの現役メンバーとOGの公式Threadsの投稿を、日付・メンバー・本文から探せます。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://threads.karin-archive.com/">
+<meta property="og:site_name" content="ハロプロ Threads 検索">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="site-head">
+  <h1><a href="/">ハロプロ Threads 検索</a></h1>
+  <p class="lead">ハロプロ現役メンバーとOG（J.P ROOM・M-line・UP-FRONT PROMOTION）の公式Threadsを、日付・メンバー・本文から探せます。</p>
+  <p class="lead sec">Threadsでは難しい「日付で遡る」「本文で検索」のために、投稿を自動で集めています。リンクはThreadsの投稿に飛びます。</p>
+  <p class="lead sec"><a href="/about">このサイトについて</a> ｜ <a href="/tech">仕組み</a></p>
+</header>
+
+<main>
+  <form id="f" class="search" role="search" autocomplete="off">
+    <div class="q-row">
+      <input id="q" type="search" placeholder="本文から探す（空のままなら新着）" aria-label="検索語" enterkeyhint="search">
+      <button type="submit">検索</button>
+    </div>
+    <!-- 取得不可の人も並ぶので、検索結果の抜粋には使わせない(ページ全体は noindex にしない) -->
+    <select id="acc" multiple size="7" aria-label="メンバー（Ctrl/⌘で複数選択）" data-nosnippet></select>
+    <div class="row">
+      <label>いつから <input type="date" id="from"></label>
+      <label>いつまで <input type="date" id="to"></label>
+      <button type="button" class="ghost" id="reset">リセット</button>
+    </div>
+    <p class="hint">メンバー未選択なら全員。Ctrl（Macは⌘）を押しながらクリックで複数選べます。一覧のメンバー名を押すと、その人だけに絞り込めます。空白で区切ると「全部含む」投稿を探します。</p>
+    <p class="hint" data-nosnippet>選択欄の一番下の「取得不可」は、取得できなかった人です（公開プロフィールでない・フォロワーが100人未満など）。条件を満たせば自動で取得が始まります。</p>
+  </form>
+
+  <section class="cal" aria-label="投稿カレンダー">
+    <div class="cal-head">
+      <button type="button" class="ghost" data-move="-12" aria-label="前の年">«</button>
+      <button type="button" class="ghost" data-move="-1" aria-label="前の月">‹</button>
+      <strong id="cal-title"></strong>
+      <button type="button" class="ghost" data-move="1" aria-label="次の月">›</button>
+      <button type="button" class="ghost" data-move="12" aria-label="次の年">»</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <p class="hint">数字はその日の投稿数（メンバー・本文の条件込み）。日付を押すとその日だけを表示し、もう一度押すと解除します。</p>
+  </section>
+
+  <ul id="list" class="list"></ul>
+  <p id="status" class="status" aria-live="polite"></p>
+  <button type="button" id="more" class="more" hidden>さらに古い投稿</button>
+</main>
+
+<footer class="site-foot">
+  <p id="latest"></p>
+  <p>本文は先頭の一部だけを表示しています。画像・動画は保存していません。取得できるのはビジネス／クリエイターアカウントのみです。</p>
+  <p><a href="/about">このサイトについて</a> ｜ <a href="/tech">仕組み</a> ｜ <a href="https://karin-archive.com/">宮本佳林・M-line・ハロプロ Archive</a></p>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

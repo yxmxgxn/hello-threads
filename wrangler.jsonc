@@ -1,0 +1,33 @@
+{
+  "name": "hello-threads",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    // すべて Worker を通す。合言葉(SITE_PASS)を画面にも掛けるため。
+    // 公開して合言葉をやめるときは ["/api/*"] に戻すと、静的ファイルは Worker を通らず配信される
+    "run_worker_first": true
+  },
+  // 公開URL threads.karin-archive.com はダッシュボードで付けたカスタムドメイン
+  // (Workers & Pages → hello-threads → 設定 → ドメインとルート)。
+  // ここに routes を書くとデプロイ用トークンにゾーンの権限が要るので書かない
+  // 毎日 JST 20:00 に Discord へ件数と新着を報告する(src/worker.js の scheduled)
+  "triggers": {
+    "crons": ["0 11 * * *"]
+  },
+  // 1分あたりの同一IPからの公開API呼び出し上限(Workers のレート制限バインディング)
+  "unsafe": {
+    "bindings": [
+      { "name": "RL", "type": "ratelimit", "namespace_id": "1003", "simple": { "limit": 120, "period": 60 } }
+    ]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hello-threads",
+      // ダッシュボード → ストレージとデータベース → D1 → hello-threads
+      "database_id": "REPLACE_WITH_D1_ID"
+    }
+  ]
+}

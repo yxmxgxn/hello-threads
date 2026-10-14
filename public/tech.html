@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="only light">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#8C6BB8">
+<title>仕組み - ハロプロ Threads 検索</title>
+<meta name="description" content="ハロプロ Threads 検索の仕組み。どうやって投稿を集め、何を保存し、何をしないと決めているか。">
+<meta property="og:title" content="仕組み - ハロプロ Threads 検索">
+<meta property="og:description" content="どうやって投稿を集め、何を保存し、何をしないと決めているか。">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://threads.karin-archive.com/tech">
+<meta property="og:url" content="https://threads.karin-archive.com/tech">
+<meta property="og:site_name" content="ハロプロ Threads 検索">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="site-head">
+  <h1><a href="/">ハロプロ Threads 検索</a></h1>
+  <p class="lead">仕組み</p>
+  <p class="lead sec"><a href="/about">このサイトについて</a> ｜ <a href="/">検索に戻る</a></p>
+</header>
+
+<main class="doc">
+  <p class="doc-lead">
+    ハロー！プロジェクトのメンバーとOGの公式Threadsを、日付と本文から探せるようにした個人サイトです。
+    どうやって投稿を集め、何を保存し、何をしないと決めているかを説明します。
+  </p>
+
+  <h2>1. 全体の作り</h2>
+  <p>
+    Cloudflare Workers と D1（SQLite）で動いています。サーバーやコンテナはありません。
+    1日に数回、収録プログラムが Threads から新しい投稿を集め、検索用の索引に入れます。
+    検索のたびに Threads へ問い合わせることはありません。
+  </p>
+  <p>
+    どのアカウントを収録するかは、同じ作者のサイト（karin-archive）の「SNS一覧」の元になっている表で決めています。
+  </p>
+
+  <h2>2. 投稿の集め方</h2>
+  <p>
+    Meta が公開している<strong>公式の Threads API（プロフィールの投稿一覧）</strong>を使っています。
+    ページを読み取って中身を抜き出す、いわゆるスクレイピングはしていません。
+  </p>
+  <ul>
+    <li>収録のたびに、各アカウントの<strong>最新の投稿</strong>をまとめて読みます</li>
+    <li>過去の投稿は、APIの利用上限の範囲で<strong>少しずつ遡って</strong>います</li>
+    <li>このAPIで読めるのは、公開プロフィールでフォロワーが100人以上のアカウントの、公開されている投稿だけです</li>
+  </ul>
+
+  <h2>3. 検索のしかた</h2>
+  <p>
+    形態素解析（単語への分割）は使わず、投稿の文章を<strong>2文字ずつ区切った索引</strong>で引いています。
+    入力した文字列がそのまま並んでいる投稿を探す「部分一致」に近い動きになります。
+  </p>
+  <ul>
+    <li>全角・半角、英字の大文字・小文字は区別しません</li>
+    <li>記号・句読点・改行・絵文字・ハッシュタグの「#」は無視します</li>
+    <li>空白で区切ると、すべての語を含む投稿に絞り込みます（100文字まで）</li>
+    <li>2文字以上の語で検索します。1文字だけの語では絞り込みません</li>
+  </ul>
+
+  <h2>4. 表示するもの</h2>
+  <p>
+    一覧には、投稿日時・名前・投稿の種類と、文章の<strong>先頭の一部</strong>だけを出します。
+    投稿を見るときは Threads の元の投稿へ移動します。このサイトの役目は、元の投稿を見つけて送り届けることです。
+  </p>
+
+  <h2>5. わかっている制約</h2>
+  <ul>
+    <li><strong>消された投稿を自動では消せません</strong>。公式のAPIで分かるのは「いまある投稿」だけのためです。連絡をもらえれば手で消します</li>
+    <li><strong>文章の書き直しに追従するのは最近の投稿だけ</strong>です</li>
+    <li><strong>ひらがなとカタカナは別扱い</strong>。「りんご」で「リンゴ」は出ません</li>
+    <li>投稿日時は日本時間で、分までです</li>
+  </ul>
+
+  <h2>6. 取らない・やらないと決めたこと</h2>
+  <ul>
+    <li>画像・動画・音声は<strong>1バイトも保存しない</strong>。文字だけです</li>
+    <li>文章の全文は画面に出さない</li>
+    <li>リポスト・返信・いいね・フォロワーなど、本人の投稿以外の情報は取らない</li>
+    <li>公式のAPI以外の方法（スクレイピングなど）で取りに行かない</li>
+    <li>検索した言葉やアクセスの記録を取らない</li>
+  </ul>
+  <p>
+    消してほしい・載せないでほしいという連絡があれば、そのとおりに対応します。
+    ご連絡は、<a href="https://karin-archive.com/">karin-archive</a>（同じ作者のサイト）のページ下にある「誤りの報告・追加のご要望」から送ってください。
+  </p>
+</main>
+
+<footer class="site-foot">
+  <p><a href="/about">このサイトについて</a> ｜ <a href="/">検索に戻る</a></p>
+  <p>画像・動画・音声はこのサイトには保存していません。投稿は Threads でご覧ください。</p>
+</footer>
+</body>
+</html>

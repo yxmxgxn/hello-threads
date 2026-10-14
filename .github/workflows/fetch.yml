@@ -1,0 +1,36 @@
+name: Fetch
+
+# 1日4回取得する(JST 3:15 / 9:15 / 15:15 / 19:15)。19:15 は 20:00 の毎日の報告の直前に揃えるため。
+# Threads の profile_posts の上限は24時間で1000回。1回200回までなら4回で収まる。
+on:
+  schedule:
+    - cron: '15 0,6,10,18 * * *'
+  workflow_dispatch:
+    inputs:
+      max_calls:
+        description: Threads API の呼び出し上限(24時間で1000回まで)
+        default: "200"
+
+concurrency:
+  group: fetch
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch
+        env:
+          CRAWL_API: ${{ vars.CRAWL_API }}
+          CRAWL_TOKEN: ${{ secrets.CRAWL_TOKEN }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          # 審査が通るまでの動作確認用(例: threads,meta)。空ならSNS一覧スプシの対象を使う
+          TARGETS: ${{ vars.TARGETS }}
+          MAX_CALLS: ${{ inputs.max_calls || '200' }}
+        run: python crawler/fetch.py
