@@ -27,7 +27,7 @@
       "binding": "DB",
       "database_name": "hello-threads",
       // ダッシュボード → ストレージとデータベース → D1 → hello-threads
-      "database_id": "REPLACE_WITH_D1_ID"
+      "database_id": "32463e3b-57e6-46dd-a947-00ed87d25a70"
     }
   ]
 }
