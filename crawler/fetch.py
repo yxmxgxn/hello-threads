@@ -178,7 +178,7 @@ def err_text(e: urllib.error.HTTPError) -> str:
     except ValueError:
         return f"HTTP {e.code}"
     if err.get("code") == 190:
-        return "アクセストークンが無効(期限切れ?)"
+        return f"アクセストークンが無効(190/{err.get('error_subcode')} {err.get('message', '')})"
     return f"{err.get('code')}/{err.get('error_subcode')} {err.get('message', '')}"
 
 
@@ -254,7 +254,8 @@ def main() -> int:
                                         "state": {"after": st["after"], "done": st["done"]}})
                 saved += len(media.get("data", []))
     except urllib.error.HTTPError:
-        warn("アクセストークンが無効です。発行し直して THREADS_ACCESS_TOKEN を更新してください")
+        warn("アクセストークンが無効です。発行し直して THREADS_ACCESS_TOKEN を更新してください\n"
+             + (failed[-1] if failed else ""))
         return 1
 
     pending = sum(1 for t in targets if not state.get(t["username"], {}).get("done"))
